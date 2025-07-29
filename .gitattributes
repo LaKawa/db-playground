@@ -1,0 +1,31 @@
+# Normalize all text files to use LF in the repository
+* text=auto eol=lf
+
+# Force specific file types to be treated as text with LF endings
+*.cs     text eol=lf
+*.xaml   text eol=lf
+*.xml    text eol=lf
+*.json   text eol=lf
+*.md     text eol=lf
+*.yml    text eol=lf
+*.sh     text eol=lf
+*.bat    text eol=lf
+*.ps1    text eol=lf
+
+# Binary files (no automatic line ending conversion)
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.mp3    binary
+*.mp4    binary
+*.ogg    binary
+*.zip    binary
+*.dll    binary
+*.exe    binary
+
+# Optional: keep Rider/IDEA project files consistent too
+*.sln    text eol=lf
+*.csproj text eol=lf
+*.props  text eol=lf
+*.targets text eol=lf
