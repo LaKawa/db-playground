@@ -1,0 +1,63 @@
+# Rider
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+TestResults/
+*.log
+*.tlog
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# dotCover
+.idea/.idea.DotSettings
+.idea/.idea.DotSettings.user
+.idea/dotCover.DotSettings
+
+# Rider caches
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/dataSources/
+
+# Rider-specific
+*.iml
+out/
+
+# Visual Studio / VSCode
+.vs/
+.vscode/
+*.pdb
+*.cache
+*.dbmdl
+*.vcxproj.user
+
+# ASP.NET
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+.nuget/
+packages/
+*.psmdcp
+
+# CLI Generated Files
+nohup.out
