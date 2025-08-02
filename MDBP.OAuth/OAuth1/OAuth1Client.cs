@@ -1,4 +1,6 @@
-﻿namespace OAuth.OAuth1;
+﻿using System.Net.Http.Headers;
+
+namespace OAuth.OAuth1;
 
 public class OAuth1Client(
     HttpClient client,
@@ -12,6 +14,11 @@ public class OAuth1Client(
 
 public async Task<OAuthToken> GetRequestTokenAsync()
 {
+    // TODO: add exception-handling for faulty Url's if needed
+    var request = new HttpRequestMessage(HttpMethod.Get, requestTokenUrl);
+    request.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+    // TODO: generate authorization headers - adding discogs specific parts in integration class lib rn
+    request.Headers.Authorization = new AuthenticationHeaderValue("TODO");
     var response = await client.GetAsync(requestTokenUrl);
         throw new NotImplementedException();
     }
