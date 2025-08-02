@@ -11,6 +11,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MDBP.DiscogsIntegration", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscogsIntegration", "MDBP.DiscogsIntegration\DiscogsIntegration.csproj", "{63A21F1F-3326-4D9E-96C0-9819A6D3F975}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MDBP.OAuth", "MDBP.OAuth", "{318C7936-703A-4405-E081-6C055C74224C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OAuth", "MDBP.OAuth\OAuth.csproj", "{2A1B2B41-F03B-4500-A06A-1E10014F98B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,18 @@ Global
 		{63A21F1F-3326-4D9E-96C0-9819A6D3F975}.Release|x64.Build.0 = Release|Any CPU
 		{63A21F1F-3326-4D9E-96C0-9819A6D3F975}.Release|x86.ActiveCfg = Release|Any CPU
 		{63A21F1F-3326-4D9E-96C0-9819A6D3F975}.Release|x86.Build.0 = Release|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Debug|x64.Build.0 = Debug|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Debug|x86.Build.0 = Debug|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Release|x64.ActiveCfg = Release|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Release|x64.Build.0 = Release|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Release|x86.ActiveCfg = Release|Any CPU
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,5 +68,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E7FFD412-1279-451C-B922-CC91397FF245} = {CC749A8E-6257-D0D2-888A-4FAD4DB94AC4}
 		{63A21F1F-3326-4D9E-96C0-9819A6D3F975} = {1CF0509F-093A-75B2-32D8-313631532400}
+		{2A1B2B41-F03B-4500-A06A-1E10014F98B8} = {318C7936-703A-4405-E081-6C055C74224C}
 	EndGlobalSection
 EndGlobal
