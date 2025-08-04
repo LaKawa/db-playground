@@ -84,7 +84,7 @@ public class OAuth1Client : IOAuthClient
         throw new NotImplementedException();
     }
 
-    private string BuildAuthorizationHeader(
+    public string BuildAuthorizationHeader(
         string? token,
         string? tokenSecret,
         string? callbackUrl,

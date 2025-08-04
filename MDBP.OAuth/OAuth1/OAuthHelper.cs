@@ -1,15 +1,25 @@
-﻿namespace OAuth.OAuth1;
+﻿using System.Security.Cryptography;
+using System.Text;
 
-public class OAuthHelper
+namespace OAuth.OAuth1;
+
+public static class OAuthHelper
 {
     public static string GenerateNonce()
     {
-        throw new NotImplementedException();
+        using var rng = RandomNumberGenerator.Create();
+        var bytes = new byte[16];
+        rng.GetBytes(bytes);
+        var sb = new StringBuilder(32); // extra space for hexadecimal encoding
+        foreach (var b in bytes)
+            sb.Append(b.ToString("X2"));
+        return sb.ToString();
     }
 
     public static string GenerateTimestamp()
     {
-        throw new NotImplementedException();
+        var secondsSinceEpoch = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        return secondsSinceEpoch.ToString();
     }
 
     public static bool IsValidUrl(string url) =>
