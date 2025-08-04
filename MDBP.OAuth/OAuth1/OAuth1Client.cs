@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Text;
 
 namespace OAuth.OAuth1;
 
@@ -52,7 +53,7 @@ public class OAuth1Client : IOAuthClient
     public async Task<OAuthToken> GetRequestTokenAsync()
     {
         var request = new HttpRequestMessage(HttpMethod.Get, _requestTokenUrl);
-        request.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+       // request.Content = new StringContent("Content-Type", Encoding.UTF8, "application/x-www-form-urlencoded");
         
         var authHeader = BuildAuthorizationHeader(
             token: null,
@@ -62,8 +63,11 @@ public class OAuth1Client : IOAuthClient
             httpMethod: "GET",
             url: _requestTokenUrl);
         request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", authHeader.Replace("OAuth ", ""));
+        request.Headers.UserAgent.Add(new ProductInfoHeaderValue("DiscogsCollectionSync", "0.1"));
         
-        var response = await _client.GetAsync(_requestTokenUrl);
+        var response = await _client.SendAsync(request);
+        
+        Console.WriteLine(response.StatusCode);
         
         // handle response here!
         throw new NotImplementedException();
@@ -102,7 +106,7 @@ public class OAuth1Client : IOAuthClient
             ["oauth_nonce"] = nonce,
             ["oauth_signature_method"] = _signatureMethod.ToString(),
             ["oauth_timestamp"] = timestamp,
-            ["oauth_version"] = "1.0"
+            //["oauth_version"] = "1.0"
         };
 
         if (!string.IsNullOrEmpty(callbackUrl))
@@ -125,7 +129,9 @@ public class OAuth1Client : IOAuthClient
         // TODO: needs to be sorted when we implement HMACSHA1
         var headerParams = parameters
             .Where(kvp => kvp.Key.StartsWith("oauth_"))
-            .Select(kvp => $"{kvp.Key}=\"{Uri.EscapeDataString(kvp.Value)}\"");
+            .Select(kvp => $"{kvp.Key}=\"{kvp.Value}\"");
+                // ? $"{kvp.Key}=\"{Uri.EscapeDataString(kvp.Value)}\""
+                    //: $"{kvp.Key}=\"{kvp.Value}\"");
         
         var header = "OAuth " + string.Join(", ", headerParams);
         

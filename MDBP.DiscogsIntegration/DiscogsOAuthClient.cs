@@ -23,6 +23,7 @@ public class DiscogsOAuthClient(HttpClient httpClient)
     
     public async Task<string> GetRequestTokenAsync()
     {
-        throw new NotImplementedException();
+        await _authClient.GetRequestTokenAsync();
+        return "TODO";
     } 
 }
