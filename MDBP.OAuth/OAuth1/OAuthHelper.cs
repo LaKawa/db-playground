@@ -3,9 +3,9 @@ using System.Text;
 
 namespace OAuth.OAuth1;
 
-public static class OAuthHelper
+internal static class OAuthHelper
 {
-    public static string GenerateNonce()
+    internal static string GenerateNonce()
     {
         using var rng = RandomNumberGenerator.Create();
         var bytes = new byte[16];
@@ -16,12 +16,24 @@ public static class OAuthHelper
         return sb.ToString();
     }
 
-    public static string GenerateTimestamp()
+    internal static string GenerateTimestamp()
     {
         var secondsSinceEpoch = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         return secondsSinceEpoch.ToString();
     }
 
-    public static bool IsValidUrl(string url) =>
+    internal static Dictionary<string, string> ParseQueryString(string query)
+    {
+        return query
+            .Split('&')
+            .Select(chunk => chunk.Split('='))
+            .Where(pair => pair.Length == 2)
+            .ToDictionary(pair => Uri.UnescapeDataString(pair[0]),
+                pair => Uri.UnescapeDataString(pair[1]));
+    }
+
+    internal static bool IsValidUrl(string url) =>
         Uri.TryCreate(url, UriKind.Absolute, out _);
+    
+     
 }
