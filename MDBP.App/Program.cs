@@ -5,6 +5,8 @@ using MusicDBPlayground.DiscogsIntegration;
 Console.WriteLine("Hello, World!");
 using var client = new HttpClient();
 var discogsClient = new DiscogsOAuthClient(client);
-await discogsClient.GetRequestTokenAsync();
+var result = discogsClient.AuthorizeWithOAuth1();
 
+
+Console.ReadLine();
 Console.WriteLine("Done!");

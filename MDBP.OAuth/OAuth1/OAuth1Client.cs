@@ -3,6 +3,7 @@ using System.Text;
 
 namespace OAuth.OAuth1;
 
+// TODO: could add a facade service class to start authorization to hide internals
 public class OAuth1Client : IOAuthClient
 {
     private readonly HttpClient _client;
@@ -14,6 +15,9 @@ public class OAuth1Client : IOAuthClient
     private readonly string _callbackUrl;
     private readonly OAuthSignatureMethod _signatureMethod;
 
+    private const string ProductName = "DiscogsCollectionSync";
+    private const string ProductVersion = "0.1"; // get this from config file?
+
     public OAuth1Client(HttpClient client,
         string consumerKey,
         string consumerSecret,
@@ -24,6 +28,7 @@ public class OAuth1Client : IOAuthClient
         OAuthSignatureMethod signatureMethod)
     {
         ValidateInputData(client, consumerKey, consumerSecret, requestTokenUrl, accessTokenUrl, authorizeUrl, callbackUrl, signatureMethod);
+        
         _client = client;
         _consumerKey = consumerKey;
         _consumerSecret = consumerSecret;
@@ -50,10 +55,18 @@ public class OAuth1Client : IOAuthClient
             throw new ArgumentOutOfRangeException(nameof(signatureMethod), "Invalid OAuth signature method!");
     }
 
+    public async Task AuthorizeWithOAuth1()
+    {
+        var oAuthToken = await GetRequestTokenAsync();
+        var authorizeUri = GetAuthorizeUri(oAuthToken);
+        // open browser with uri
+        
+        //var verifier = await
+    }
+
     public async Task<OAuthToken> GetRequestTokenAsync()
     {
         var request = new HttpRequestMessage(HttpMethod.Get, _requestTokenUrl);
-       // request.Content = new StringContent("Content-Type", Encoding.UTF8, "application/x-www-form-urlencoded");
         
         var authHeader = BuildAuthorizationHeader(
             token: null,
@@ -62,24 +75,53 @@ public class OAuth1Client : IOAuthClient
             verifier: null,
             httpMethod: "GET",
             url: _requestTokenUrl);
-        request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", authHeader.Replace("OAuth ", ""));
-        request.Headers.UserAgent.Add(new ProductInfoHeaderValue("DiscogsCollectionSync", "0.1"));
+        request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", authHeader);
+        request.Headers.UserAgent.Add(new ProductInfoHeaderValue(ProductName, ProductVersion));
+        
         
         var response = await _client.SendAsync(request);
-        
-        Console.WriteLine(response.StatusCode);
-        
-        // handle response here!
-        throw new NotImplementedException();
+        response.EnsureSuccessStatusCode(); // could handle this gracefully without throwing?
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var values = OAuthHelper.ParseQueryString(content);
+
+        if (!values.TryGetValue("oauth_token", out var token) ||
+            !values.TryGetValue("oauth_token_secret", out var tokenSecret) ||
+            !values.TryGetValue("oauth_callback_confirmed", out var callbackConfirmed) ||
+            callbackConfirmed != "true")
+            throw new InvalidOperationException("Invalid response from request token endpoint despite 200(OK) response code!");
+
+        return new OAuthToken
+        {
+            Token = token,
+            TokenSecret = tokenSecret,
+        };
     }
 
-    public Uri GetAuthorizeUrl(OAuthToken requestToken)
+   
+    public Uri GetAuthorizeUri(OAuthToken requestToken)
     {
-        throw new NotImplementedException();
+        return new Uri($"{_authorizeUrl}?oauth_token={requestToken.Token}");
     }
-
-    public Task<OAuthToken> GetAccessTokenAsync(OAuthToken requestToken, string verifier)
+    
+    public async Task<OAuthToken> GetAccessTokenAsync(OAuthToken requestToken, string verifier)
     {
+        var request = new HttpRequestMessage(HttpMethod.Post, _accessTokenUrl);
+        
+        var oAuthHeader = BuildAuthorizationHeader(
+            token: requestToken.Token,
+            tokenSecret: requestToken.TokenSecret,
+            callbackUrl: null,
+            verifier: verifier,
+            httpMethod: "POST",
+            url: _accessTokenUrl);
+        request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", oAuthHeader);
+        request.Headers.UserAgent.Add(new ProductInfoHeaderValue(ProductName, ProductVersion));
+       
+        var response = await _client.SendAsync(request);
+        
+        response.EnsureSuccessStatusCode();
         throw new NotImplementedException();
     }
 
@@ -106,7 +148,7 @@ public class OAuth1Client : IOAuthClient
             ["oauth_nonce"] = nonce,
             ["oauth_signature_method"] = _signatureMethod.ToString(),
             ["oauth_timestamp"] = timestamp,
-            //["oauth_version"] = "1.0"
+            ["oauth_version"] = "1.0"
         };
 
         if (!string.IsNullOrEmpty(callbackUrl))
@@ -133,7 +175,7 @@ public class OAuth1Client : IOAuthClient
                 // ? $"{kvp.Key}=\"{Uri.EscapeDataString(kvp.Value)}\""
                     //: $"{kvp.Key}=\"{kvp.Value}\"");
         
-        var header = "OAuth " + string.Join(", ", headerParams);
+        var header = string.Join(", ", headerParams);
         
         return header;
     }
