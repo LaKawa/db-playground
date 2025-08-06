@@ -1,4 +1,4 @@
-﻿namespace OAuth.OAuth1;
+﻿namespace OAuth.OAuth1.Models;
 
 public enum OAuthSignatureMethod
 {

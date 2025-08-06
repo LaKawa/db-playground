@@ -1,4 +1,6 @@
-﻿namespace OAuth.OAuth1;
+﻿using OAuth.OAuth1.Models;
+
+namespace OAuth.OAuth1;
 
 public interface IOAuthClient
 {
