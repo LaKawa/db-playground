@@ -3,7 +3,7 @@ using System.Text;
 
 namespace OAuth.OAuth1;
 
-internal static class OAuthHelper
+internal static class OAuthUtils
 {
     internal static string GenerateNonce()
     {
@@ -34,6 +34,4 @@ internal static class OAuthHelper
 
     internal static bool IsValidUrl(string url) =>
         Uri.TryCreate(url, UriKind.Absolute, out _);
-    
-     
 }

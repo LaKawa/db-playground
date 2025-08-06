@@ -1,15 +1,16 @@
 ﻿using System.Net;
 using OAuth.OAuth1;
+using OAuth.OAuth1.Models;
 
 namespace MDBP.Tests;
 
-public class OAuth1ClientTests
+public class OAuthClientTests
 {
     [Fact]
     public void BuildAuthorizationHeader_Plaintext_ReturnsHeader()
     {
         var client = new HttpClient();
-        var oAuthClient = new OAuth1Client(
+        var oAuthClient = new OAuthClient(
             client,
             "testKey",
             "testSecret",

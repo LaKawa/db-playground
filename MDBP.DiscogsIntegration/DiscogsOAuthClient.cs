@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Net;
 using OAuth.OAuth1;
+using OAuth.OAuth1.Models;
 
 namespace MusicDBPlayground.DiscogsIntegration;
 
@@ -13,14 +14,18 @@ public class DiscogsOAuthClient : IDisposable
     private readonly HttpClient _httpClient;
 
     private readonly HttpListener _listener;
-    private readonly OAuth1Client _oauthClient;
+    private readonly OAuthClient _oauthClient;
+
+    private const string ProductName = "DiscogsCollectionSync";
+    private const string ProductVersion = "0.1";
 
 
     public DiscogsOAuthClient(HttpClient httpClient)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-
-        _oauthClient = new OAuth1Client(
+        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd($"{ProductName}/{ProductVersion}");
+        
+        _oauthClient = new OAuthClient(
             httpClient,
             Environment.GetEnvironmentVariable("DISCOGS_CONSUMER_KEY")
             ?? throw new InvalidOperationException("DISCOGS_CONSUMER_KEY isn't set as environment variable!"),
@@ -78,13 +83,6 @@ public class DiscogsOAuthClient : IDisposable
             FileName = authorizeUri.ToString(),
             UseShellExecute = true
         });
-    }
-
-
-    public async Task<string> GetRequestUrlWithToken()
-    {
-        var requestToken = await _oauthClient.GetRequestTokenAsync();
-        return $"{AuthorizeUrl}?oauth_token={requestToken.Token}";
     }
 
     public void Dispose()
