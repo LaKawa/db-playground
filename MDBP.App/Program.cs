@@ -4,15 +4,10 @@ using MusicDBPlayground.DiscogsIntegration;
 using MusicDBPlayground.DiscogsIntegration.Security;
 
 Console.WriteLine("Hello, World!");
-Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
 using var client = new HttpClient();
-var discogsClient = new DiscogsOAuthClient(client);
-var result = await discogsClient.AuthorizeWithOAuth1();
+var discogsClient = new DiscogsClient(client);
+await discogsClient.AuthenticateAsync();
 
-
-
-Console.WriteLine(result.Token);
-Console.WriteLine(result.TokenSecret);
 
 
 Console.ReadLine();
