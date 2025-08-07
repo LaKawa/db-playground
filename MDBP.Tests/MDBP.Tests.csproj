@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MDBP.DiscogsIntegration\DiscogsIntegration.csproj" />
     <ProjectReference Include="..\MDBP.OAuth\OAuth.csproj" />
   </ItemGroup>
 

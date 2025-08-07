@@ -1,0 +1,20 @@
+﻿using MusicDBPlayground.DiscogsIntegration.Services;
+
+namespace MDBP.Tests;
+
+public class EncryptionServiceTests
+{
+    [Fact]
+    public void Encrypt_Then_Decrypt_ReturnsOriginalText()
+    {
+        const string passphrase = "test-passphrase";
+        var service = new EncryptionService();
+        var salt = service.GenerateRandomSalt();
+        const string originalText = "Hello Discogs!";
+    
+        var encrypted = service.Encrypt(originalText, passphrase, salt);
+        var decrypted = service.Decrypt(encrypted, passphrase, salt);
+    
+        Assert.Equal(originalText, decrypted);
+    }
+}
