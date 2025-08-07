@@ -1,6 +1,6 @@
 ﻿namespace MusicDBPlayground.DiscogsIntegration;
 
-public class Class1
+public class DiscogsApiClient
 {
 
 }
