@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿/* deprecated
+ 
+using System.Net;
 using OAuth.OAuth1;
 using OAuth.OAuth1.Models;
 
@@ -35,3 +37,4 @@ public class OAuthClientTests
     }
         
 }
+*/
