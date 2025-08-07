@@ -3,47 +3,26 @@ using System.Security.Cryptography;
 
 namespace MusicDBPlayground.DiscogsIntegration.Security;
 
-public class LocalKeyProvider
+public class LocalKeyProvider(ISecureStorage secureStorage)
 {
     private const string KeyFileName = ".discogs_aes.key";
 
-    public static string GetOrCreateKey()
+    public string GetOrCreateKey()
     {
-        var keyFilePath = GetKeyFilePath();
-        
-        if(File.Exists(keyFilePath))
-            return File.ReadAllText(keyFilePath);
-        
-        var keyBytes = RandomNumberGenerator.GetBytes(32);
-        var base64Key = Convert.ToBase64String(keyBytes);
-
-        Directory.CreateDirectory(Path.GetDirectoryName(keyFilePath)!);
-        
-        File.WriteAllText(keyFilePath, base64Key);
-        
-        if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            File.SetAttributes(keyFilePath, File.GetAttributes(keyFilePath) | FileAttributes.Hidden);
-        
-        return base64Key;
-    }
-
-    private static string GetKeyFilePath()
-    {
-        string baseDir;
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        try
         {
-            baseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return Path.Combine(baseDir, "DiscogsIntegration", KeyFileName);
+            var key = secureStorage.Load(KeyFileName);
+            if (!string.IsNullOrEmpty(key))
+                return key;
+        }
+        catch (FileNotFoundException)
+        {
+            var keyBytes = RandomNumberGenerator.GetBytes(32);
+            var base64Key = Convert.ToBase64String(keyBytes);
+            secureStorage.Save(KeyFileName, base64Key);
+            return base64Key;
         }
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            baseDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            return Path.Combine(baseDir, "DiscogsIntegration", KeyFileName);
-        }
-
-        baseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), ".config");
-        return Path.Combine(baseDir, "discogs-integration", KeyFileName);
+        throw new InvalidOperationException("Wasn't able to create new, or load existing key!");
     }
 }
