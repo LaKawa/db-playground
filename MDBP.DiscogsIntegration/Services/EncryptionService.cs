@@ -4,13 +4,13 @@ namespace MusicDBPlayground.DiscogsIntegration.Services;
 
 public class EncryptionService
 {
-   public string GenerateRandomSalt(int size = 16)
+   public static string GenerateRandomSalt(int size = 16)
    {
       var saltBytes = RandomNumberGenerator.GetBytes(size);
       return Convert.ToBase64String(saltBytes);
    }
 
-   private (byte[] key, byte[] iv) DeriveKeyAndIv(string passphrase, string base64Salt)
+   private static (byte[] key, byte[] iv) DeriveKeyAndIv(string passphrase, string base64Salt)
    {
       var saltBytes = Convert.FromBase64String(base64Salt);
       using var deriveBytes = new Rfc2898DeriveBytes(passphrase, saltBytes, 100_000, HashAlgorithmName.SHA256);
@@ -19,7 +19,7 @@ public class EncryptionService
       return (key, iv);
    }
 
-   public string Encrypt(string plainText, string passphrase, string base64Salt)
+   public static string Encrypt(string plainText, string passphrase, string base64Salt)
    {
       var (key, iv) = DeriveKeyAndIv(passphrase, base64Salt);
       
@@ -38,7 +38,7 @@ public class EncryptionService
       return Convert.ToBase64String(memoryStream.ToArray());
    }
 
-   public string Decrypt(string cipherText, string passphrase, string base64Salt)
+   public static string Decrypt(string cipherText, string passphrase, string base64Salt)
    {
       var (key, iv) = DeriveKeyAndIv(passphrase, base64Salt);
       var cipherBytes = Convert.FromBase64String(cipherText);

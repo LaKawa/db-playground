@@ -8,6 +8,8 @@ public class DiscogsDbContext : DbContext
 
    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
    {
-      optionsBuilder.UseSqlite("Data Source=discogs.db");
+      var projectFolder = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "MDBP.DiscogsIntegration");
+      var dbPath = Path.Combine(projectFolder, "discogs.db");
+      optionsBuilder.UseSqlite($"Data Source={dbPath}");
    }
 }
