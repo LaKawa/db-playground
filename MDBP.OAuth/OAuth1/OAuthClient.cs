@@ -1,4 +1,5 @@
-﻿using OAuth.OAuth1.Models;
+﻿using System.Net.Http.Headers;
+using OAuth.OAuth1.Models;
 
 namespace OAuth.OAuth1;
 
@@ -7,9 +8,14 @@ namespace OAuth.OAuth1;
 public class OAuthClient : IOAuthClient
 {
     private readonly HttpClient _client;
-    private readonly OAuthRequestSettings _requestTokenSettings;
+    private readonly OAuthSettings _requestTokenSettings;
     private readonly string _accessTokenUrl;
     private readonly string _authorizeUrl;
+
+    private readonly string _consumerKey;
+    private readonly string _consumerSecret;
+    
+    private readonly OAuthSignatureMethod _signatureMethod;
 
     public OAuthClient(HttpClient client,
         string consumerKey,
@@ -24,7 +30,7 @@ public class OAuthClient : IOAuthClient
             callbackUrl, oAuthSignatureMethod);
 
         // initial state for 1st oAuth token request
-        _requestTokenSettings = new OAuthRequestSettings(
+        _requestTokenSettings = new OAuthSettings(
             url: requestTokenUrl,
             consumerKey,
             consumerSecret,
@@ -35,6 +41,9 @@ public class OAuthClient : IOAuthClient
         _client = client;
         _accessTokenUrl = accessTokenUrl;
         _authorizeUrl = authorizeUrl;
+        _consumerKey = consumerKey;
+        _consumerSecret = consumerSecret;
+        _signatureMethod = oAuthSignatureMethod;
     }
 
     private static void ValidateInputData(HttpClient client, string consumerKey, string consumerSecret,
@@ -88,7 +97,40 @@ public class OAuthClient : IOAuthClient
 
     public void SignRequest(HttpRequestMessage request, OAuthToken accessToken, string httpMethod)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(accessToken);
+        if(string.IsNullOrWhiteSpace(accessToken.Token))
+            throw new ArgumentException("Access token is required!", nameof(accessToken));
+        if(string.IsNullOrWhiteSpace(accessToken.TokenSecret))
+            throw new ArgumentException("Access token secret is required!", nameof(accessToken));
+
+        switch (_signatureMethod)
+        {
+            case OAuthSignatureMethod.PLAINTEXT:
+                SignPlaintext(request, accessToken);
+                break;
+            case OAuthSignatureMethod.HMACSHA1:
+                throw new NotImplementedException("HMAC-SHA1 is not implemented yet");
+                break;
+            default:
+                throw new NotSupportedException("Unsupported OAuth signature method");
+        }
+    }
+
+    private void SignPlaintext(HttpRequestMessage request, OAuthToken accessToken)
+    {
+        // shouldn't be a bottleneck, but could add extra method overload to avoid
+        // constructing a new OAuthSettings object every time - or store locally on OAuthClient?
+        var settings = new OAuthSettings(
+            url: "",    // TODO: hacky, refactor this - url not used for signing 
+            consumerKey: _consumerKey,
+            consumerSecret: _consumerSecret,
+            httpMethod: request.Method,
+            oAuthSignatureMethod: OAuthSignatureMethod.PLAINTEXT,
+            token: accessToken.Token,
+            tokenSecret: accessToken.TokenSecret);
+
+        OAuthRequestSigner.SignRequest(request, settings);
     }
 
 

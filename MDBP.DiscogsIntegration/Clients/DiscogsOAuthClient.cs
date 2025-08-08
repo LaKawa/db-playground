@@ -3,7 +3,7 @@ using System.Net;
 using OAuth.OAuth1;
 using OAuth.OAuth1.Models;
 
-namespace MusicDBPlayground.DiscogsIntegration;
+namespace MusicDBPlayground.DiscogsIntegration.Clients;
 
 public class DiscogsOAuthClient : IDisposable
 {
@@ -18,6 +18,16 @@ public class DiscogsOAuthClient : IDisposable
 
     private const string ProductName = "DiscogsCollectionSync";
     private const string ProductVersion = "0.1";
+
+
+    public OAuthToken? AccessToken { get; private set; }
+
+    public void SetAccessToken(OAuthToken token)
+    {
+        if (AccessToken != null)
+            throw new InvalidOperationException("AccessToken is already set and cannot be overwritten.");
+        AccessToken = token;
+    }
 
 
     public DiscogsOAuthClient(HttpClient httpClient)
@@ -73,9 +83,16 @@ public class DiscogsOAuthClient : IDisposable
         OpenUriInBrowser(authorizeUri);
         var verifier = await ListenForVerifierCallbackAsync();
         
-        return await _oauthClient.GetAccessTokenAsync(requestToken, verifier);
+        AccessToken = await _oauthClient.GetAccessTokenAsync(requestToken, verifier);
+        return AccessToken;
     }
 
+    public void SignRequest(HttpRequestMessage request)
+    {
+        if (AccessToken == null) throw new InvalidOperationException("Access token is not set!");
+        _oauthClient.SignRequest(request, AccessToken, request.Method.ToString());
+    }
+    
     private static void OpenUriInBrowser(Uri authorizeUri)
     {
         Process.Start(new ProcessStartInfo
