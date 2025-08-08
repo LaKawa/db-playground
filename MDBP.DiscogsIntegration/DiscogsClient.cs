@@ -1,8 +1,10 @@
 ﻿using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
+using MusicDBPlayground.DiscogsIntegration.Clients;
 using MusicDBPlayground.DiscogsIntegration.Data;
 using MusicDBPlayground.DiscogsIntegration.Security;
 using MusicDBPlayground.DiscogsIntegration.Services;
+using OAuth.OAuth1.Models;
 
 namespace MusicDBPlayground.DiscogsIntegration;
 
@@ -17,8 +19,8 @@ public class DiscogsClient
 
     public DiscogsClient(HttpClient httpClient)
     {
-        _apiClient = new DiscogsApiClient();
         _authClient = new DiscogsOAuthClient(httpClient);
+        _apiClient = new DiscogsApiClient(httpClient, _authClient);
         Console.WriteLine($"Working directory: {Environment.CurrentDirectory}");
         _db = new DiscogsDbContext();
         _encryptionService = new EncryptionService();
@@ -38,8 +40,17 @@ public class DiscogsClient
         var existingToken = await _db.OAuthTokens.FirstOrDefaultAsync();
         if (existingToken != null)
         {
+            // TODO: very hacky, refactor!
             Console.WriteLine("Token already exists, don't need to request again!");
             Console.WriteLine(existingToken.EncryptedToken);
+            var tokenName = EncryptionService.Decrypt(existingToken.EncryptedToken, _keyProvider.GetOrCreateKey(), existingToken.Salt);
+            var secret = EncryptionService.Decrypt(existingToken.EncryptedTokenSecret, _keyProvider.GetOrCreateKey(), existingToken.Salt);
+            var oAuthToken = new OAuthToken()
+            {
+                Token = tokenName,
+                TokenSecret = secret
+            };
+            _authClient.SetAccessToken(oAuthToken);
             return;
         }
         
@@ -63,4 +74,7 @@ public class DiscogsClient
         await _db.SaveChangesAsync();
         Console.WriteLine("Saved changes to Database!");
     }
+
+    public async Task<string> GetUserIdentityAsync()
+        => await _apiClient.GetIdentityAsync();
 }

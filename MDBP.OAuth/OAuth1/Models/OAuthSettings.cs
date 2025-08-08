@@ -1,5 +1,5 @@
 ﻿namespace OAuth.OAuth1.Models;
-internal record OAuthRequestSettings
+internal record OAuthSettings
 {
     public string Url { get; init; }
     public string ConsumerKey { get; init; }
@@ -11,7 +11,7 @@ internal record OAuthRequestSettings
     public string? CallbackUrl { get; init; }
     public string? Verifier { get; init; }
 
-    public OAuthRequestSettings(
+    public OAuthSettings(
         string url,
         string consumerKey,
         string consumerSecret,
