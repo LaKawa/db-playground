@@ -62,6 +62,7 @@ packages/
 # CLI Generated Files
 nohup.out
 
-# Database-runtime files
+# Database
+*.db
 *.db-shm
 *.db-wal
